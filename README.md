@@ -13,6 +13,9 @@
 5. execute command
     `php artisan serve`
 
+
 Visit home page at
 
 http://localhost:8000/parser
+
+6. register a new user and try above url
