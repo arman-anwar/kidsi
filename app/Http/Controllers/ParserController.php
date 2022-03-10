@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Profile;
 use Illuminate\Http\Request;
 
 class ParserController extends Controller
@@ -11,9 +12,32 @@ class ParserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    private function parser()
     {
-        //
+        $path = storage_path() . "\\2020-01-02.json";
+
+        $json = json_decode(file_get_contents($path), true);
+
+        $data = [];
+        foreach ($json as $game) {
+            if (array_key_exists('attachments', $game)) {
+                $data[$game['client_msg_id']] = array(
+                    'client_msg_id' => $game['client_msg_id'],
+                    'title' => $game['attachments'][0]['title'],
+                    'image_url' => array_key_exists('image_url', $game['attachments'][0]) ? $game['attachments'][0]['image_url'] : null,
+                    'title_link' => $game['attachments'][0]['title_link'],
+                    'ts' => array_key_exists('ts', $game['attachments'][0]) ? $game['attachments'][0]['ts'] : null,
+                );
+            }
+        }
+        return $data;
+    }
+
+     public function index()
+    {
+
+        $data = $this->parser();
+        return view('data.index')->with('members', $data);
     }
 
     /**
@@ -23,7 +47,11 @@ class ParserController extends Controller
      */
     public function create()
     {
-        //
+        $data = $this->parser();
+        // var_dump( $data);
+        Profile::truncate();
+        Profile::insert($data);
+        return redirect('parser')->with('flash_message', 'Data saved!');
     }
 
     /**
