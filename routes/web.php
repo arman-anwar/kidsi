@@ -17,4 +17,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('parser' ,'App\Http\Controllers\ParserController');
+// Route::resource('parser' ,'App\Http\Controllers\ParserController');
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/parser', 'App\Http\Controllers\ParserController@index');
+Route::middleware(['auth:sanctum', 'verified'])->get('/parser/create', 'App\Http\Controllers\ParserController@create');
